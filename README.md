@@ -86,6 +86,7 @@ OTHER:
 
 There are some methods in pcov_tools.py that are useful for use in Jupyter notebooks. I need to document these better, but for example:
 
+```
 gen_genome_coverage_table(pcovs, stb, min_c = 1)
 """
 Calcuate the coverage and breadth of genomes from pcov files, return a pandas dataframe with all this info
@@ -94,7 +95,7 @@ pcovs = list of .pcov files
 stb = file containing scaffold to bin information
 min_c = minimum coverage a window much have to be considered "present" during breadth calculattion
 """
-
+```
 
 ### .pcov file format
 
