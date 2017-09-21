@@ -1,12 +1,12 @@
 # pipeCoverage
-Quickly calculate coverage and quasi-breadth of sequences from a mapping. Usefull to avoid creating large .sam files when only coverage inforamtion is desired.
+Quickly calculate coverage and breadth of sequences from a mapping. Usefull to avoid creating large .sam files when only coverage inforamtion is desired.
 
-## Description
+## Quick start
 `pipe_coverage.awk` is used to convert .sam formatted data into .pcov formatted data. .pcov files contain coverage information for each scaffold, as well as the coverage of windows accross the scaffolds (to get an idea of breadth). 
 
 `pcov_tools.py` is used to process .pcov files into more useful formats. These includes coverage tables needed for automated-binned, and the files needed to make ESOMs.
 
-## `pipe_coverage.awk`
+## pipe_coverage.awk
 
 This awk script can be used to .pcov files in a variety of ways. For example:
 
@@ -29,9 +29,58 @@ $ cat foo.fasta-vs-sample01.sam | awk -f pipe_coverage.awk > foo.fasta-vs-sample
 samtools view foo.fasta-vs-sample01.bam | awk -f pipe_coverage.awk > foo.fasta-vs-sample01.pcov
 ```
 
-## `pcov_tools.py`
+## pcov_tools.py
 
-This python script is used to process .pcov files into more useful outputs.
+This python script is used to process .pcov files into more useful outputs. For example:
+
+**Generate coverage table from pcovs mapping to the same original sequnce:**
+```
+$ pcov_tools.py -p foo.fa-vs-sample01.pcov foo.fa-vs-sample02.pcov foo.fa-vs-sample03.pcov -o foo.fa.coverage -c --header
+
+$ head foo.fa.coverage.cov
+# scaffold      foo.fa-vs-sample01.pcov       foo.fa-vs-sample02.pcov       foo.fa-vs-sample03.pcov
+scaffold_1516_read_length_100_read_count_18682        0.245003        0.0614925       0.0
+scaffold_1573_read_length_100_read_count_174  0.0     0.0     0.0
+scaffold_1432_read_length_100_read_count_331  0.0847442       0.0     2.75576
+scaffold_2632_read_length_100_read_count_76   5.40076 60.4315 221.066
+scaffold_1923_read_length_100_read_count_119  0.0     0.0     0.0
+scaffold_592_read_length_100_read_count_427   0.0     0.0977909       0.0
+scaffold_2407_read_length_100_read_count_54   0.0     0.0     0.0
+scaffold_2522_read_length_100_read_count_1478 0.0     0.0     0.0
+scaffold_1377_read_length_100_read_count_195  0.0     3.85477 0.24264
+```
+
+** See help for full list of commands:**
+```$ pcov_tools.py -h
+usage: pcov_tools.py [-h] -p [BCOVS [BCOVS ...]] [-o OUT] [-a] [-c] [-n] [-l]
+                     [-auto] [--min_window MIN_WINDOW] [--header]
+                     [--fix_names]
+
+INPUT/OUTPUT:
+  -h                    show this help message and exit
+  -p [BCOVS [BCOVS ...]], --bcovs [BCOVS [BCOVS ...]]
+                        .bcov file(s) (from pipe_coverage.awk) (default: None)
+  -o OUT, --out OUT     output basename (default: None)
+
+OPPERATIONS:
+  -a, --all             generate all possible outputs (default: False)
+  -c, --coverage        generate coverage file of complete scaffolds (CONCOCT
+                        format) (default: False)
+  -n, --names           generate esom.names files (default: False)
+  -l, --learn           generate single UN-NORMALIZED esom.lrn file (default:
+                        False)
+  -auto, --auto         group .pcov filenames based on the first 12 characters
+                        (default: False)
+
+OTHER:
+  --min_window MIN_WINDOW
+                        minimum window size to allow for .esom files (default:
+                        3000)
+  --header              write a header in coverage table (will not work
+                        natively with CONCOCT) (default: False)
+  --fix_names           attempt to fix scaffold names messed up by SNAP
+                        (default: False)
+```
 
 
 ### .pcov file format
