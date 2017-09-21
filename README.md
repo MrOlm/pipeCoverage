@@ -50,7 +50,7 @@ scaffold_2522_read_length_100_read_count_1478 0.0     0.0     0.0
 scaffold_1377_read_length_100_read_count_195  0.0     3.85477 0.24264
 ```
 
-** See help for full list of commands:**
+**See help for full list of commands:**
 ```$ pcov_tools.py -h
 usage: pcov_tools.py [-h] -p [BCOVS [BCOVS ...]] [-o OUT] [-a] [-c] [-n] [-l]
                      [-auto] [--min_window MIN_WINDOW] [--header]
