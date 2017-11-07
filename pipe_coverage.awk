@@ -1,5 +1,10 @@
 #! /usr/bin/awk -f 
 
+# Version 0.4
+# 11/07/17
+# Changed the default RC
+
+
 # Version 0.3
 # 1/11/16
 # Matt Olm
@@ -21,7 +26,7 @@
 # variables can be changed be passing them into awk with -v (awk -v BL=5000)
 BEGIN{
 if (BL == "") BL = 3000;
-if (RC == "") RC = 10000
+if (RC == "") RC = 1000000
 j = 0
 }
 
