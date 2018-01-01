@@ -5,6 +5,10 @@ import sys
 import os
 import pandas as pd
 
+# Version 0.6
+# 1/1/18
+# Made genome summary possible from command line
+
 # Version 0.5
 # 9/18/17
 # Fixed minor error message bug
@@ -341,6 +345,7 @@ def gen_genome_coverage_table(pcovs, stb, min_c = 1):
 
     Gdb = pd.DataFrame(Table)
     Gdb['coverage'] = (Gdb['RL'] * Gdb['read_count'])/Gdb['length']
+    Gdb.fillna('')
 
     return(Gdb)
 
@@ -381,6 +386,7 @@ if __name__ == '__main__':
     InArgs.add_argument('-h', action="help", help="show this help message and exit")
     InArgs.add_argument("-p", "--bcovs", nargs='*', help=".bcov file(s) (from pipe_coverage.awk)", required = True)
     InArgs.add_argument("-o", "--out", help="output basename")
+    InArgs.add_argument("-s", "--stb", help="scaffold to bin file (for genome-level coverage)")
 
     #Operational Arguments
     OpArgs = parser.add_argument_group('OPPERATIONS')
@@ -388,6 +394,7 @@ if __name__ == '__main__':
     OpArgs.add_argument("-c", "--coverage", help="generate coverage file of complete scaffolds (CONCOCT format)", action = 'store_true')
     OpArgs.add_argument("-n", "--names", help="generate esom.names files", action = 'store_true')
     OpArgs.add_argument("-l", "--learn", help="generate single UN-NORMALIZED esom.lrn file", action = 'store_true')
+    OpArgs.add_argument("-g", "--genomes", help="calculate breadth and coverage of genomes (need stb)", action = 'store_true')
     OpArgs.add_argument("-auto", "--auto", help="group .pcov filenames based on the first 12 characters", action = 'store_true')
 
     #Other Arguments
@@ -402,11 +409,21 @@ if __name__ == '__main__':
         args.coverage = True
         args.names = True
         args.learn = True
+        args.genomes = True
     if args.out == None:
         out = os.path.abspath('./') + '/'
     else:
         out = os.path.abspath(args.out)
         if os.path.isdir(out): out = out + '/'
+
+    # Do genome one if needed
+    if args.genomes:
+        if args.stb == None:
+            print('scaffold to bin file required for per-genome coverage')
+            sys.exit()
+        else:
+            gdb = gen_genome_coverage_table(args.bcovs, args.stb)
+            gdb.to_csv(out + '_genome_coverage_table.csv', index=False)
 
     ### Parse .bcov files
     bcovs = parse_bcovs(args.bcovs,args.min_window,args.fix_names)
