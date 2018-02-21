@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project (attempts to) adhere to [Semantic Versioning](http://semver.org/).
 
+## [1.1] - 2018-02-21
+### changed
+- Updated pcov_tools (notes in the top of file in comments)
+
 ## [1.0] - 2017-09-21
 ### changed
 - Combined pipe_coverage.awk version 0.3 and pcov_tools.py version 0.5 to make combined version 1.0

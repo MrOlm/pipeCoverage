@@ -1,4 +1,4 @@
-# pipeCoverage
+i# pipeCoverage
 Quickly calculate coverage and breadth of sequences from a mapping. Usefull to avoid creating large .sam files when only coverage inforamtion is desired.
 
 ## Quick start

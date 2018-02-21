@@ -5,6 +5,16 @@ import sys
 import os
 import pandas as pd
 
+# Version 0.8
+# 2/8/18
+# min_l for parse_bcov is now 1
+# change the way you open files
+
+# Version 0.7
+# 1/9/18
+# gen_genome_coverage_table now fills with 0 instead of ''
+# gen_genome_coverage_table now accepts dict stb (as opposed to file)
+
 # Version 0.6
 # 1/1/18
 # Made genome summary possible from command line
@@ -160,9 +170,10 @@ def group_pcovs(lis):
     return groups
 
 def parse_RL(file):
-    for line in open(file).readlines():
-        if line.startswith('# read length:'):
-            return float(line.split()[3])
+    with open(file, 'r') as fi:
+        for line in fi.readlines():
+            if line.startswith('# read length:'):
+                return float(line.split()[3])
 
 def fixname(name, id):
     if id == 'scaffold':
@@ -181,33 +192,34 @@ def fixname(name, id):
             name = name + "_" + w
         return name
 
-def parse_bcov(cov,min_l=3000,fix=False):
+def parse_bcov(cov,min_l=1,fix=False):
     neurons = {}
     scaffolds = {}
     l = 1 # To keep track of the length range of windows
     w = 1 # To keep track of the window number
     i = 1 # To keep track of the total number of neurons
-    for line in open(cov).readlines():
-        if line.startswith('#'):
-            continue # Header
-        name,coverage,length = line.strip().split('\t')
-        length = int(length)
-        coverage = float(coverage)
+    with open(cov, 'r') as fi:
+        for line in fi.readlines():
+            if line.startswith('#'):
+                continue # Header
+            name,coverage,length = line.strip().split('\t')
+            length = int(length)
+            coverage = float(coverage)
 
-        if not name.startswith('>'): # Scaffold
-            if fix: name = fixname(name,'scaffold')
-            scaffolds[name] = Scaffold(name,length,coverage)
-            l = 1
-            w = 1
+            if not name.startswith('>'): # Scaffold
+                if fix: name = fixname(name,'scaffold')
+                scaffolds[name] = Scaffold(name,length,coverage)
+                l = 1
+                w = 1
 
-        if name.startswith('>'): # Neuron
-            if fix: name = fixname(name,'neuron')
-            r = range(l,l+length)
-            l += length
-            if length < min_l: continue
-            neurons[name[1:]] = Neuron(name[1:],r,coverage,i,w)
-            i += 1
-            w += 1
+            if name.startswith('>'): # Neuron
+                if fix: name = fixname(name,'neuron')
+                r = range(l,l+length)
+                l += length
+                if length < min_l: continue
+                neurons[name[1:]] = Neuron(name[1:],r,coverage,i,w)
+                i += 1
+                w += 1
 
     B = Bcov(os.path.basename(cov),neurons,scaffolds)
     B.path = cov
@@ -295,6 +307,7 @@ def write_esomNames(Bcov,out):
         end = r[-1]
         o.write('{0}\t{1}\t{2}:({3},{4}),\n'.format(n.id,n.name,n.getScaffold(),\
         start,end))
+    o.close()
 
 def write_learn(Bcovs,out):
     neurons = Bcovs[0].neuronNames()
@@ -316,7 +329,6 @@ def write_learn(Bcovs,out):
             o.write("{0}\t".format(B.ncov(n)))
         o.write("\n")
 
-
     o.close()
 
 def gen_genome_coverage_table(pcovs, stb, min_c = 1):
@@ -324,7 +336,10 @@ def gen_genome_coverage_table(pcovs, stb, min_c = 1):
     db = pcovs_to_df(pcovs)
 
     # Load scaffold to bin information
-    stb = b2s_to_s2b(parse_stb(stb))
+    if type(stb) == dict:
+        pass
+    else:
+        stb = b2s_to_s2b(parse_stb(stb))
     db['bin'] = db['scaffold'].map(stb)
 
     # Convert to genome to bin
@@ -345,7 +360,7 @@ def gen_genome_coverage_table(pcovs, stb, min_c = 1):
 
     Gdb = pd.DataFrame(Table)
     Gdb['coverage'] = (Gdb['RL'] * Gdb['read_count'])/Gdb['length']
-    Gdb.fillna('')
+    Gdb.fillna(0)
 
     return(Gdb)
 
