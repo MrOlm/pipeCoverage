@@ -26,7 +26,7 @@ $ cat foo.fasta-vs-sample01.sam | awk -f pipe_coverage.awk > foo.fasta-vs-sample
 
 **From .bam file:**
 ```
-samtools view foo.fasta-vs-sample01.bam | awk -f pipe_coverage.awk > foo.fasta-vs-sample01.pcov
+samtools view -h foo.fasta-vs-sample01.bam | awk -f pipe_coverage.awk > foo.fasta-vs-sample01.pcov
 ```
 
 ## pcov_tools.py
