@@ -1,4 +1,6 @@
-i# pipeCoverage
+[![HitCount](http://hits.dwyl.io/mrolm/pipeCoverage.svg)](http://hits.dwyl.io/mrolm/pipeCoverage)
+
+# pipeCoverage
 Quickly calculate coverage and breadth of sequences from a mapping. Usefull to avoid creating large .sam files when only coverage inforamtion is desired.
 
 ## Quick start
