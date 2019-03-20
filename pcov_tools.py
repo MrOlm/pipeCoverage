@@ -261,10 +261,26 @@ def autogroup(Bcovs,out):
         groups[name].append(B)
     return(groups)
 
-def write_output(coverage,names,learn,Bcovs,out,header):
+def write_output(coverage,names,learn,bed,Bcovs,out,header):
     if coverage: write_coverage(Bcovs,out,header)
     if names: write_esomNames(Bcovs[0],out)
     if learn: write_learn(Bcovs,out)
+    if bed: write_bed(Bcovs,out)
+
+def write_bed(Bcovs,out):
+    for Bcov in Bcovs:
+        neurons = Bcov.getNeurons()
+        neurons = sorted(neurons, key = lambda x: x.id)
+
+        o = open(out + '_' + Bcov.name + ".bed",'w')
+        for n in neurons:
+            r = n.range
+            start = r[0]
+            end = r[-1]
+            cov = n.coverage
+            o.write('{0}\t{1}\t{2}\t{3}\n'.format(n.getScaffold(),\
+            start,end,cov))
+        o.close()
 
 def write_coverage(Bcovs,out,header=False,neurons=False):
     if not neurons:
@@ -404,13 +420,14 @@ if __name__ == '__main__':
     InArgs.add_argument("-s", "--stb", help="scaffold to bin file (for genome-level coverage)")
 
     #Operational Arguments
-    OpArgs = parser.add_argument_group('OPPERATIONS')
+    OpArgs = parser.add_argument_group('OPERATIONS')
     OpArgs.add_argument("-a", "--all", help="generate all possible outputs", action = 'store_true')
     OpArgs.add_argument("-c", "--coverage", help="generate coverage file of complete scaffolds (CONCOCT format)", action = 'store_true')
     OpArgs.add_argument("-n", "--names", help="generate esom.names files", action = 'store_true')
     OpArgs.add_argument("-l", "--learn", help="generate single UN-NORMALIZED esom.lrn file", action = 'store_true')
     OpArgs.add_argument("-g", "--genomes", help="calculate breadth and coverage of genomes (need stb)", action = 'store_true')
     OpArgs.add_argument("-auto", "--auto", help="group .pcov filenames based on the first 12 characters", action = 'store_true')
+    OpArgs.add_argument("-b", "--bed", help="generate a .bed file of windows and their coverage.", action = 'store_true')
 
     #Other Arguments
     OtherArgs = parser.add_argument_group('OTHER')
@@ -425,6 +442,7 @@ if __name__ == '__main__':
         args.names = True
         args.learn = True
         args.genomes = True
+        args.bed = True
     if args.out == None:
         out = os.path.abspath('./') + '/'
     else:
@@ -455,4 +473,4 @@ if __name__ == '__main__':
 
     ### Write outputs
     for group in groups:
-        write_output(args.coverage,args.names,args.learn,groups[group],group,args.header)
+        write_output(args.coverage,args.names,args.learn,args.bed,groups[group],group,args.header)
